@@ -1,0 +1,12 @@
+{
+  "attributes": [
+    {"name": "Intelligenz"},
+    {"name": "Geld"},
+    {"name": "Bezihung"},
+    {"name": "Drogen"},
+    {"name": "Stress"},
+    {"name": "Fitness"},
+    {"name": "Fußball"},
+    {"name": "Boxen"}
+  ]
+}

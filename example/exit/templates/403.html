@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}403{% endblock %}
+
+
+{% block content %}
+<h1>403</h1>
+<p>{% trans "What??????????"%}
+  <a href="{% if user.is_authenticated %} {% url 'simplechoice:project-list' %} {% else %} # {% endif %}">{% trans "Here it goes back ;)"%}</a>
+</p>
+{% endblock %}

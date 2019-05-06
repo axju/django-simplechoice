@@ -1,0 +1,68 @@
+{
+  "events": [
+    {
+      "event": {
+        "name": "Stress",
+        "description": "Du hast zu viel Stress und erleidest einen totlichen Herzenfakt",
+        "level_min": 35,
+        "level_max": 100,
+        "kind": "text",
+        "percent": 80
+      },
+      "attributes": [
+        {"attribute": "Stress", "kind": "min", "value": 20}
+      ]
+    },
+
+    {
+      "event": {
+        "name": "Tot",
+        "description": "Unerwarteter Tot",
+        "level_min": 1,
+        "level_max": 100,
+        "kind": "exit",
+        "percent": 2
+      }
+    },
+
+    {
+      "event": {
+        "name": "Lotto",
+        "description": "Du gewinnst im Lotto.",
+        "level_min": 18,
+        "level_max": 100,
+        "percent": 1,
+        "score": 20
+      }
+    },
+
+    {
+      "event": {
+        "name": "Drogen",
+        "description": "Die Polizei durchsucht dein Haus und findet Drogen bei dir. Du muss für 2 Tage in untersuchuns Haft",
+        "level_min": 18,
+        "level_max": 25,
+        "percent": 40,
+        "score": -20
+      },
+      "attributes": [
+        {"attribute": "Drogen", "kind": "min", "value": 20}
+      ]
+    },
+
+    {
+      "event": {
+        "name": "Drogen",
+        "description": "Du stirbst an einer Überdosis.",
+        "level_min": 22,
+        "level_max": 50,
+        "percent": 60,
+        "kind": "exit"
+      },
+      "attributes": [
+        {"attribute": "Drogen", "kind": "min", "value": 50}
+      ]
+    }
+
+  ]
+}
