@@ -16,11 +16,7 @@ class GameMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if not request.session.get('game', ''):
             request.session['game'] = get_random_string(length=32)
-
         self.game, created = Game.objects.get_or_create(key=request.session['game'])
-        if created:
-            for attr in Attribute.objects.all():
-                self.game.attributes.create(attribute=attr, value_max=randint(attr.start_min, attr.start_max))
         return super(GameMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

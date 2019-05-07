@@ -43,17 +43,6 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ALLOWED_HOSTS = []
 
 
-SIMPLECHOICE = {
-    'EXITS': [
-        {
-            'name': 'Simple',
-            'text': 'Du hattes eine erfülltes Leben, aber es ist nichts spannendes pasiert',
-            'min': 0, 'max': 1,
-        }
-    ]
-
-}
-
 # Application definition
 
 INSTALLED_APPS = [

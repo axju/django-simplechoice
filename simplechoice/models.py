@@ -1,5 +1,6 @@
 from random import randint
 from django.db import models
+from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -120,7 +121,6 @@ class Game(models.Model):
         open = self.decisions.filter(answer__isnull=True).count()
         total = self.get_decision_query().count()
 
-        print(count, total)
         if open:
             return round(100 * ( count / (total + count + 1) ))
         elif total:
@@ -148,11 +148,9 @@ class Game(models.Model):
         return q
 
     def get_event(self):
-        print('check events')
         for event in self.get_event_query():
-            n = randint(1,100)
-            print(' ', event, n, event.percent)
-            if n <= event.percent:
+            n = randint(1,10000)
+            if n <= event.percent * 100:
                 return event
         return None
 
@@ -173,12 +171,10 @@ class Game(models.Model):
 
         game_decision = self.decisions.filter(answer__isnull=True).first()
         if game_decision:
-            print('Have open decisions')
             return game_decision.decision
 
         decision = self.get_decision_query().first()
         if decision:
-            print('Created new decisions')
             self.decisions.create(decision=decision)
             self.level = decision.level
             self.save()
@@ -197,16 +193,17 @@ class Game(models.Model):
     def choice(self, choice):
         game_decision = self.decisions.filter(answer__isnull=True).first()
         if not game_decision:
-            print('Error')
-            return
+            raise Http404("No more questions")
 
-        answer = Answer.objects.get(pk=choice)
+        answer = game_decision.decision.answers.filter(pk=choice).first()
+        if not answer:
+            raise Http404("Answer not posible")
+
         game_decision.answer = answer
         game_decision.save()
-        print('Save answer {}'.format(answer))
 
         for attr in answer.attributes.all():
-            attribute = self.attributes.get(attribute=attr.attribute)
+            attribute, _ = self.attributes.get_or_create(attribute=attr.attribute)
             value = min(attribute.value + attr.value, attribute.value_max)
             attribute.value = max(value, 0)
             attribute.save()
@@ -220,6 +217,11 @@ class Game(models.Model):
             else:
                 self.update_ranking()
         self.save()
+
+    def seen(self):
+        if self.event and self.event.kind != 'exit':
+            self.events.update(seen=True)
+            self.save()
 
 class GameDecision(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='decisions')

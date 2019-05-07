@@ -1,5 +1,5 @@
 from django import forms
-
+from django.http import Http404
 
 class BasicGameForm(forms.Form):
 
@@ -23,13 +23,14 @@ class DecisionGameForm(BasicGameForm):
 
         decision = self.game.decision
         if not decision:
-            print('error')
-            return
+            raise Http404("No more questions")
 
         OPTIONS = [ (a.pk, a.name) for a in decision.answers.order_by('?')]
-        self.fields['decision'] = forms.ChoiceField(label=decision.question, widget=forms.RadioSelect(), choices=OPTIONS)
+        self.fields['decision'] = forms.ChoiceField(
+            label=decision.question,
+            widget=forms.RadioSelect(),
+            choices=OPTIONS
+        )
 
     def save(self):
-        print('Save form')
-        print('Data', self.cleaned_data['decision'])
         self.game.choice(self.cleaned_data['decision'])

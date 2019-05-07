@@ -1,0 +1,95 @@
+{
+  "attributes": [
+    {"name": "attri1"},
+    {"name": "attri2"}
+  ],
+  "events": [
+    {
+      "event": {
+        "name": "event1",
+        "kind": "text",
+        "percent": 100,
+        "score": 50
+      },
+      "attributes": [
+        {"attribute": "attri1", "kind": "min", "value": 5}
+      ]
+    },
+
+    {
+      "event": {
+        "name": "event2",
+        "kind": "exit",
+        "percent": 100
+      },
+      "attributes": [
+        {"attribute": "attri2", "kind": "min", "value": 5}
+      ]
+    }
+  ],
+
+  "questions": [
+    {
+      "decision" : {
+        "question": "question1",
+        "level": 1
+      },
+      "answers": [
+        {
+          "text": "attri1",
+          "attributes": [
+            {"attribute": "attri1", "value": 2}
+          ]
+        },
+        {
+          "text": "attri2",
+          "attributes": [
+            {"attribute": "attri2", "value": 2}
+          ]
+        }
+      ]
+    },
+
+    {
+      "decision" : {
+        "question": "question2",
+        "level": 1
+      },
+      "answers": [
+        {
+          "text": "attri1",
+          "attributes": [
+            {"attribute": "attri1", "value": 2}
+          ]
+        },
+        {
+          "text": "attri2",
+          "attributes": [
+            {"attribute": "attri2", "value": 2}
+          ]
+        }
+      ]
+    },
+
+    {
+      "decision" : {
+        "question": "question3",
+        "level": 1
+      },
+      "answers": [
+        {
+          "text": "attri1",
+          "attributes": [
+            {"attribute": "attri1", "value": 2}
+          ]
+        },
+        {
+          "text": "attri2",
+          "attributes": [
+            {"attribute": "attri2", "value": 2}
+          ]
+        }
+      ]
+    }
+  ]
+}
