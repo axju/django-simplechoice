@@ -4,9 +4,8 @@ from django.views.generic import FormView, TemplateView
 from django.views.generic import ListView
 from django.urls import reverse_lazy
 
-from random import randint
 from django.utils.crypto import get_random_string
-from simplechoice.models import Game, Attribute
+from simplechoice.models import Game
 from simplechoice.forms import NewGameForm, DecisionGameForm
 
 
@@ -57,18 +56,34 @@ class GameNew(View):
         return redirect('simplechoice:index')
 
 
-class GameDelete(GameMixin, View):
+class GameDelete(View):
 
     def get(self, request, *args, **kwargs):
-        self.game.delete()
-        self.game.update_ranking()
+        if request.session.get('game', ''):
+            self.game, created = Game.objects.get_or_create(key=request.session['game'])
+            self.game.delete()
         return redirect('simplechoice:index')
 
 
 class GameList(ListView):
     template_name = 'simplechoice/list.html'
-    paginate_by = 50
+    paginate_by = 20
     queryset = Game.objects.filter(ranking__gt=0).order_by('ranking')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.session.get('game', ''):
+            return super(GameList, self).dispatch(request, *args, **kwargs)
+
+        self.game, created = Game.objects.get_or_create(key=request.session['game'])
+        page_kwarg = self.page_kwarg
+        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg)
+        if not page:
+            self.kwargs[self.page_kwarg] = int((self.game.ranking - 1) / self.paginate_by) + 1
+        return super(GameList, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs['game'] = self.game
+        return super(GameList, self).get_context_data(**kwargs)
 
 
 class GameDebug(GameMixin, TemplateView):

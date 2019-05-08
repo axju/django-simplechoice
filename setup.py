@@ -8,12 +8,12 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-simplechoice',
-    version='0.1',
+    version='0.1.0',
 
     author='Axel Juraske',
     author_email='axel.juraske@short-report.de',
     url='https://github.com/axju/django-simplechoice',
-    description='A simple Django app to conduct Web-based polls.',
+    description='A simple Django app to build a multiple choice game.',
     long_description=README,
 
     license='MIT License',

@@ -4,8 +4,9 @@ simplechoice
 I design a small multiple choice game. The django app simplechoice is the basic
 core of this game. I write this package, because I like reusable apps. ;)
 
-Take a look in the example folder and play with the project.
+Take a look in the project Exit_ to see how you can use django-simplechoice.
 
+.. _Exit: https://github.com/axju/exit
 
 Development
 -----------
@@ -52,9 +53,15 @@ Run some tests
 
 .. code-block:: shell
 
-  $ flake8 simplechoice
-  $ python setup.py test
-  $ python -m unittest discover -v
+  $ flake8 --ignore=E501 simplechoice
+  $ python tests/manage.py test simplechoice
   $ tox
 
-I do not know why, but tox will fail :(
+Tools
+-----
+.. code-block:: shell
+
+  $ python -m pip install --upgrade coverage
+  $ coverage run --source=simplechoice --omit=*migrations* tests/manage.py test simplechoice
+  $ coverage run --branch --source=simplechoice --omit=*migrations* tests/manage.py test simplechoice
+  $ coverage report

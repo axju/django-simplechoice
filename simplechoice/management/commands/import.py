@@ -3,6 +3,7 @@ import json
 from django.core.management.base import BaseCommand
 from simplechoice.models import Attribute, Decision, Event
 
+
 class Command(BaseCommand):
     help = 'Import game data'
 
@@ -57,7 +58,6 @@ class Command(BaseCommand):
             self.import_events(data.get('events', []))
         except Exception as e:
             self.stdout.write(self.style.ERROR('Cannot load file "{}"\n{}'.format(filename, e)))
-
 
     def handle(self, *args, **options):
         if options['delete']:

@@ -30,6 +30,7 @@ class Decision(models.Model):
     class Meta:
         ordering = ('level', '?')
 
+
 class DecisionRequireAttribute(models.Model):
     decision = models.ForeignKey(Decision, on_delete=models.CASCADE, related_name='requires')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='+')
@@ -39,12 +40,14 @@ class DecisionRequireAttribute(models.Model):
     def __str__(self):
         return '{} [{}]'.format(self.attribute.name, self.value)
 
+
 class Answer(models.Model):
     decision = models.ForeignKey(Decision, on_delete=models.CASCADE, related_name='answers')
     name = models.CharField(_('name'), max_length=128)
 
     def __str__(self):
         return self.name[:30]
+
 
 class AnswerGetAttribute(models.Model):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, related_name='attributes')
@@ -91,6 +94,7 @@ class EventAttribute(models.Model):
 
 class Game(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(auto_now_add=True)
     key = models.CharField(_('key'), max_length=64)
     name = models.CharField(_('name'), max_length=256, null=True, blank=True)
     level = models.IntegerField(default=0)
@@ -113,7 +117,7 @@ class Game(models.Model):
 
     def score_percent(self):
         total = Game.objects.aggregate(models.Max('score'))
-        return round(100 * ( self.score / total['score__max'] ))
+        return round(100 * (self.score / total['score__max']))
     score_percent.short_description = 'Score %'
 
     def decisions_percent(self):
@@ -122,7 +126,7 @@ class Game(models.Model):
         total = self.get_decision_query().count()
 
         if open:
-            return round(100 * ( count / (total + count + 1) ))
+            return round(100 * (count / (total + count + 1)))
         elif total:
             return 0
         return 100
@@ -130,8 +134,14 @@ class Game(models.Model):
 
     def events_percent(self):
         total = Event.objects.filter(kind='text', score__gt=0).count()
-        return round(100 * ( self.events.count() / total ))
+        return round(100 * (self.events.count() / total))
     events_percent.short_description = 'Events %'
+
+    def delete(self, *args, **kwargs):
+        self.score = -1
+        self.save()
+        self.update_ranking()
+        super(Game, self).delete(*args, **kwargs)
 
     def update_ranking(self):
         i = 1
@@ -139,6 +149,7 @@ class Game(models.Model):
             game.ranking = i
             game.save()
             i += 1
+        self.refresh_from_db()
 
     def get_event_query(self):
         q = Event.objects.filter(level_min__lte=self.level, level_max__gte=self.level).exclude(games__game=self)
@@ -149,7 +160,7 @@ class Game(models.Model):
 
     def get_event(self):
         for event in self.get_event_query():
-            n = randint(1,10000)
+            n = randint(1, 10000)
             if n <= event.percent * 100:
                 return event
         return None
@@ -179,8 +190,6 @@ class Game(models.Model):
             self.level = decision.level
             self.save()
             return decision
-
-        self.update_ranking()
         return None
 
     @property
@@ -214,14 +223,13 @@ class Game(models.Model):
 
             if event.kind != 'exit':
                 self.score += event.score
-            else:
-                self.update_ranking()
         self.save()
 
     def seen(self):
         if self.event and self.event.kind != 'exit':
             self.events.update(seen=True)
             self.save()
+
 
 class GameDecision(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='decisions')
@@ -231,6 +239,7 @@ class GameDecision(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.decision, self.answer)
 
+
 class GameEvent(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='events')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='games')
@@ -239,6 +248,7 @@ class GameEvent(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.event.kind)
 
+
 class GameAttribute(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='games')
@@ -246,4 +256,4 @@ class GameAttribute(models.Model):
     value_max = models.IntegerField(default=100)
 
     def __str__(self):
-        return self.attribute.name + ' -> ' + str(self.value) +'/' + str(self.value_max)
+        return '{} -> {}/{}'.format(self.attribute.name, self.value, self.value_max)

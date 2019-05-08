@@ -1,6 +1,6 @@
 from django.urls import path
 
-from simplechoice.views import GameIndex, GameNew, GameContinue, GameDelete, GameList, GameDebug#, PlayView#, SignupView, ActivateView, PageView
+from simplechoice.views import GameIndex, GameNew, GameContinue, GameDelete, GameList, GameDebug
 
 app_name = 'simplechoice'
 
