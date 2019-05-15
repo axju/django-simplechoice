@@ -48,6 +48,30 @@ class Command(BaseCommand):
                 attri, _ = Attribute.objects.get_or_create(name=attribute.get('attribute', 'ERROR'))
                 event.attributes.create(attribute=attri, kind=attribute.get('kind', 'min'), value=attribute.get('value', 1))
 
+    def import_levents(self, data):
+        for name, events in data.items():
+            attri, _ = Attribute.objects.get_or_create(name=name)
+
+            for event in events:
+                eve, created = Event.objects.get_or_create(
+                    name = event.get('name', 'ERROR'),
+                    description = event.get('text', 'ERROR'),
+                    score = event.get('score', 0),
+                    percent = 100,
+                )
+                eve.attributes.create(attribute=attri, kind='min', value=event.get('value', 1))
+
+    def import_ldecisions(self, questions):
+        for question in questions:
+            decision, created = Decision.objects.get_or_create(question=question.get('question', 'ERROR'),level=question.get('level', 'ERROR'))
+            if not created:
+                continue
+
+            for answer in question.get('answers', []):
+                a = decision.answers.create(name=answer['name'])
+                attri, _ = Attribute.objects.get_or_create(name=answer.get('attribute', 'ERROR'))
+                a.attributes.create(attribute=attri, value=answer.get('value', 1))
+
     def import_file(self, filename):
         try:
             with open(filename, encoding='utf8') as json_file:
@@ -56,6 +80,10 @@ class Command(BaseCommand):
             self.import_attributes(data.get('attributes', []))
             self.import_questions(data.get('questions', []))
             self.import_events(data.get('events', []))
+
+            self.import_levents(data.get('levents', {}))
+            self.import_ldecisions(data.get('ldecisions', []))
+
         except Exception as e:
             self.stdout.write(self.style.ERROR('Cannot load file "{}"\n{}'.format(filename, e)))
 

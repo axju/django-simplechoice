@@ -5,7 +5,7 @@ from django.views.generic import ListView
 from django.urls import reverse_lazy
 
 from django.utils.crypto import get_random_string
-from simplechoice.models import Game
+from simplechoice.models import Game, Attribute
 from simplechoice.forms import NewGameForm, DecisionGameForm
 
 
@@ -16,6 +16,9 @@ class GameMixin(object):
         if not request.session.get('game', ''):
             request.session['game'] = get_random_string(length=32)
         self.game, created = Game.objects.get_or_create(key=request.session['game'])
+        if created:
+            for attri in Attribute.objects.all():
+                self.game.attributes.get_or_create(attribute=attri)
         return super(GameMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

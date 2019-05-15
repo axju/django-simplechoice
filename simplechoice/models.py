@@ -13,7 +13,7 @@ VALUE_KINDS = (
 class Attribute(models.Model):
     name = models.CharField(_('attribute'), max_length=64)
     description = models.TextField(_('description'), default='...')
-    start_min = models.IntegerField(default=80)
+    start_min = models.IntegerField(default=100)
     start_max = models.IntegerField(default=100)
 
     def __str__(self):
