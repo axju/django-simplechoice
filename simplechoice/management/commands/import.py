@@ -72,7 +72,39 @@ class Command(BaseCommand):
                 attri, _ = Attribute.objects.get_or_create(name=answer.get('attribute', 'ERROR'))
                 a.attributes.create(attribute=attri, value=answer.get('value', 1))
 
-    def import_file(self, filename):
+    def import_file_text(self, filename):
+        with open(filename, encoding="utf-8") as f:
+            content = [line.rstrip(' \n') for line in f]
+
+        data = {
+            'decision' : {
+                'question': '',
+                'level': 0,
+            },
+            'answers': []
+        }
+        for item in content:
+            if item.startswith('#L: '):
+                data['decision']['level'] = int(item[4:])
+            elif item.startswith('#F: '):
+                if data['decision']['question']:
+                    self.import_questions([data])
+                data['decision']['question'] = item[4:]
+                data['answers'] = []
+            else:
+                values = item.split('|')
+                answer = {
+                    'text': values[0],
+                    'attributes': [],
+                }
+                for a in values[1:]:
+                    attri = a.split(':')
+                    if len(attri) == 2:
+                        answer['attributes'].append({'attribute': attri[0], 'value': int(attri[1])})
+                data['answers'].append(answer)
+        self.import_questions([data])
+
+    def import_file_json(self, filename):
         try:
             with open(filename, encoding='utf8') as json_file:
                 data = json.load(json_file)
@@ -86,6 +118,15 @@ class Command(BaseCommand):
 
         except Exception as e:
             self.stdout.write(self.style.ERROR('Cannot load file "{}"\n{}'.format(filename, e)))
+
+    def import_file(self, filename):
+        if filename.endswith('.json'):
+            self.import_file_json(filename)
+        elif filename.endswith('.txt'):
+            self.import_file_text(filename)
+        else:
+            self.stdout.write(self.style.ERROR('Cannot load file "{}"'.format(filename)))
+
 
     def handle(self, *args, **options):
         if options['delete']:
